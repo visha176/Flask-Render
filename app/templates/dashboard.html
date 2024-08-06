@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1 class="mb-4">Dashboard</h1>
+</div>
+<div>
+    <h2 class="section-header">Routers</h2>
+    {% if routers %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>IP Address</th>
+                    <th>Status</th>
+                    <th>Latency</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for router in routers %}
+                    <tr>
+                        <td>{{ router.name }}</td>
+                        <td>{{ router.ip_address }}</td>
+                        <td id="router-{{ router.id }}-status" class="status-offline">Loading...</td>
+                        <td id="router-{{ router.id }}-latency">Loading...</td>
+                        <td>
+                            <a href="{{ url_for('manage_router', router_id=router.id) }}" class="btn btn-outline-primary">Detail</a>
+                        </td>
+                    </tr>
+                    <script>
+                        fetch(`/ping_status/{{ router.ip_address }}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                const statusElement = document.getElementById("router-{{ router.id }}-status");
+                                const latencyElement = document.getElementById("router-{{ router.id }}-latency");
+                                if (data.status === "online") {
+                                    statusElement.innerText = "Online";
+                                    statusElement.classList.remove("status-offline");
+                                    statusElement.classList.add("status-online");
+                                } else {
+                                    statusElement.innerText = "Offline";
+                                    statusElement.classList.remove("status-online");
+                                    statusElement.classList.add("status-offline");
+                                }
+                                latencyElement.innerText = data.latency;
+                            })
+                            .catch(error => console.error('Error:', error));
+                    </script>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="empty-message">No routers added yet.</p>
+    {% endif %}
+</div>
+<div>
+    <h2 class="section-header">Servers</h2>
+    {% if servers %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>IP Address</th>
+                    <th>SSH Status</th>
+                    <th>Status</th>
+                    <th>Latency</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for server in servers %}
+                    <tr>
+                        <td>{{ server.name }}</td>
+                        <td>{{ server.ip_address }}</td>
+                        <td id="server-{{ server.id }}-ssh-status">Loading...</td>
+                        <td id="server-{{ server.id }}-status" class="status-offline">Loading...</td>
+                        <td id="server-{{ server.id }}-latency">Loading...</td>
+                        <td>
+                            <a href="{{ url_for('config_wg', server_id=server.id) }}" class="btn btn-outline-primary">Config WG</a>
+                            <a href="{{ url_for('edit_server', server_id=server.id) }}" class="btn btn-outline-secondary">Edit</a>
+                            <a href="{{ url_for('add_wg_connection', server_id=server.id) }}" class="btn btn-outline-success">Add WG Connection</a>
+                            <a href="{{ url_for('manage_connections', server_id=server.id) }}" class="btn btn-outline-info">Manage Connections</a>
+                            <form action="{{ url_for('delete_server', server_id=server.id) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <script>
+                        fetch(`/ping_status/{{ server.ip_address }}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                const statusElement = document.getElementById("server-{{ server.id }}-status");
+                                const latencyElement = document.getElementById("server-{{ server.id }}-latency");
+                                if (data.status === "online") {
+                                    statusElement.innerText = "Online";
+                                    statusElement.classList.remove("status-offline");
+                                    statusElement.classList.add("status-online");
+                                } else {
+                                    statusElement.innerText = "Offline";
+                                    statusElement.classList.remove("status-online");
+                                    statusElement.classList.add("status-offline");
+                                }
+                                latencyElement.innerText = data.latency;
+                            })
+                            .catch(error => console.error('Error:', error));
+                        
+                        fetch(`/ssh_status/{{ server.id }}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                const sshStatusElement = document.getElementById("server-{{ server.id }}-ssh-status");
+                                sshStatusElement.innerText = data.status;
+                                if (data.status === "Connected") {
+                                    sshStatusElement.classList.add("text-success");
+                                } else {
+                                    sshStatusElement.classList.add("text-danger");
+                                }
+                            })
+                            .catch(error => console.error('Error:', error));
+                    </script>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="empty-message">No servers added yet.</p>
+    {% endif %}
+</div>
+
+<!-- Include Socket.IO -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script>
+    var socket = io.connect('http://' + document.domain + ':' + location.port + '/config');
+
+    socket.on('progress', function(data) {
+        var progress = data.progress;
+        document.getElementById('progress-bar').style.width = progress + '%';
+        document.getElementById('progress-bar').innerText = progress + '%';
+    });
+
+    function startWGConfiguration(serverId) {
+        fetch(`/config_wg/${serverId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('WireGuard configured successfully!');
+                    location.reload();
+                } else {
+                    alert('WireGuard configuration failed: ' + data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+
+<!-- Progress Bar -->
+<div class="progress">
+    <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;">
+        0%
+    </div>
+</div>
+
+{% endblock %}

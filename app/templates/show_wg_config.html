@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Show WireGuard Configuration{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1 class="mb-4">WireGuard Configuration for {{ wg_connection.connection_name }}</h1>
+</div>
+<div>
+    <h3>Server: {{ wg_connection.server.name }}</h3>
+    <h3>Router: {{ wg_connection.router.name }}</h3>
+</div>
+<div class="form-group">
+    <label for="wg-config">Configuration</label>
+    <textarea id="wg-config" class="form-control" rows="10">{{ wg_connection.config }}</textarea>
+</div>
+{% endblock %}

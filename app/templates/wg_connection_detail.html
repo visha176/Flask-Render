@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}WireGuard Connection Detail{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="header">
+                <h1 class="mb-4">WireGuard Connection Detail</h1>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Connection Information</h5>
+                    <pre>{{ wg_config }}</pre>
+                </div>
+            </div>
+            <form action="{{ url_for('setup_router', connection_id=connection.id) }}" method="post">
+                <button type="submit" class="btn btn-outline-primary mt-3">Setup in Router</button>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <div class="header">
+                <h2 class="mb-4">Server IP Information</h2>
+            </div>
+            <div id="ip-info" class="card">
+                <div class="card-body">
+                    <h5 class="card-title">IP Info</h5>
+                    <div id="ip-info-content">
+                        {% if ip_info %}
+                            <p><strong>IP:</strong> {{ ip_info.ip }}</p>
+                            <p><strong>Hostname:</strong> {{ ip_info.hostname }}</p>
+                            <p><strong>City:</strong> {{ ip_info.city }}</p>
+                            <p><strong>Region:</strong> {{ ip_info.region }}</p>
+                            <p><strong>Country:</strong> {{ ip_info.country }}</p>
+                            <p><strong>Location:</strong> {{ ip_info.loc }}</p>
+                            <p><strong>Organization:</strong> {{ ip_info.org }}</p>
+                            <p><strong>Postal:</strong> {{ ip_info.postal }}</p>
+                            <p><strong>Timezone:</strong> {{ ip_info.timezone }}</p>
+                        {% else %}
+                            <p>No IP information available.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

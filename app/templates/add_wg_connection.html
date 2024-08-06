@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Add WireGuard Connection{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1 class="mb-4">Add WireGuard Connection</h1>
+</div>
+<div>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.connection_name.label(class="form-label") }}
+            {{ form.connection_name(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.router_id.label(class="form-label") }}
+            {{ form.router_id(class="form-control") }}
+        </div>
+        <button type="submit" class="btn btn-primary">Add Connection</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+body {
+    background-color: rgb(215, 209, 209);
+    color: rgb(133, 119, 119);
+}
+
+.container {
+    text-align: center;
+}
+
+.nav {
+    margin-bottom: 20px;
+}
+
+.nav a {
+    background-color: rgb(0, 0, 0);
+    color: rgb(210, 210, 210);
+    padding: 10px 20px;
+    text-decoration: none;
+    margin: 5px;
+    display: inline-block;
+}
+
+.nav a:hover {
+    background-color: rgb(6, 6, 6);
+    color: rgba(255, 255, 255, 0.964);
+}
+
+.button {
+    background-color: rgb(53, 127, 223);
+    color: black;
+    padding: 10px 20px;
+    text-decoration: none;
+    margin: 5px;
+    display: inline-block;
+}
+
+.button:hover {
+    background-color: grey;
+    color: white;
+}
+.status-online {
+    color: green;
+    font-weight: bold;
+}
+
+.status-offline {
+    color: red;
+    font-weight: bold;
+}

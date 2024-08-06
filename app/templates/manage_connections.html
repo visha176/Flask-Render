@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Manage WireGuard Connections{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1 class="mb-4">Manage WireGuard Connections for {{ server.name }}</h1>
+</div>
+<div>
+    {% if connections %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Connection Name</th>
+                    <th>Client IP</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for connection in connections %}
+                    <tr>
+                        <td>{{ connection.connection_name }}</td>
+                        <td>{{ connection.client_ip }}</td>
+                        <td>
+                            <a href="{{ url_for('wg_connection_detail', connection_id=connection.id) }}" class="btn btn-outline-info">Show</a>
+                            <form action="{{ url_for('delete_wg_connection', connection_id=connection.id) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="empty-message">No WireGuard connections found for this server.</p>
+    {% endif %}
+    <a href="{{ url_for('add_wg_connection', server_id=server.id) }}" class="btn btn-outline-success">Add WG Connection</a>
+</div>
+{% if wg_connections %}
+    <h2>Current WireGuard Connections on Server</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Peer</th>
+                <th>Endpoint</th>
+                <th>Allowed IPs</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for wg_connection in wg_connections %}
+                <tr>
+                    <td>{{ wg_connection.peer }}</td>
+                    <td>{{ wg_connection.endpoint }}</td>
+                    <td>{{ wg_connection.allowed_ips }}</td>
+                    <td>
+                        <form action="{{ url_for('delete_wg_server_connection') }}" method="post" style="display:inline;">
+                            <input type="hidden" name="peer" value="{{ wg_connection.peer }}">
+                            <input type="hidden" name="server_id" value="{{ server.id }}">
+                            <button type="submit" class="btn btn-outline-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+{% endblock %}
